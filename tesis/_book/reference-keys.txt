@@ -1,0 +1,14 @@
+introducción
+convertir-hora-local-a-solar
+preparación
+ecuación-del-tiempo
+hora-local-y-hora-solar
+conviertiendo
+función-de-r-para-calcular-hora-solar-verdadera
+probando-con-datos-reales
+detectando-actividad
+utilizando-suncalc
+etapa-del-día-según-hora-solar
+hora-solar-a-decimal-y-radianes
+jugando-con-los-datos
+kernels-de-actividad

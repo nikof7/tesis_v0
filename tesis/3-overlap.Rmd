@@ -1,0 +1,166 @@
+# Kernels de actividad
+
+Voy a utilizar el paquete overlap para realizar los graficos de kernel.
+
+Los datos utilizados continuan siendo los mismos:
+
+```{r echo=FALSE}
+load("dato_generados_en_R/datos.RData")
+datos %>% 
+  select(camara, sp, hora_solar, hora_decimal) %>% 
+  paged_table()
+```
+
+```{r}
+library(overlap)
+
+datos_Ctho <- datos %>% 
+  filter(sp == "Ctho")
+
+datos_Btau <- datos %>% 
+  filter(sp == "Btau")
+
+densityPlot(datos$hora_radianes, xcenter = "m")
+
+overlapPlot(datos_Ctho$hora_radianes, datos_Btau$hora_radianes)
+
+
+overlapPlot(datos_Ctho$hora_radianes, datos_Btau$hora_radianes, linet = c(1,1), linec = c("red", "blue"),
+rug=TRUE, extend="lightgreen", main="Simulated data")
+legend("topleft", c("Cthous", "Btaurus"), lty=1, col=c("red", "blue"), bg="white")
+# Add vertical dotted lines to mark sunrise (05:30) and sunset (18:47):
+# (times must be in hours if the x-axis is labelled in hours)
+abline(v=c(5.5, 18+47/60), lty=3)
+
+
+
+
+densityPlot(datos_Ctho$hora_radianes, xcenter="m", rug=TRUE)
+densityPlot(datos_Btau$hora_radianes, xscale=NA, add=TRUE, rug=TRUE, col='red')
+
+
+```
+
+
+
+
+## Paquete activity
+
+Este paquete tiene una forma de calcular la hora solar, función: solartime().
+
+
+
+## Paquete NPCirc
+
+```{r}
+library(NPCirc)
+```
+
+
+```{r}
+registros_sp <- datos %>% 
+  select(sp) %>% 
+  group_by(sp) %>% 
+  summarise(n_registros = n()) %>%
+  arrange(-n_registros)
+
+# Especies con mas de 35 registros:
+sp_filtradas <- registros_sp %>% 
+  filter(n_registros>35) %>% 
+  pull(sp)
+
+pruebas <- datos %>% 
+  select(camara, grupo, sp, hora_solar, hora_radianes, etapa_dia) %>% 
+  filter(sp %in% sp_filtradas)
+
+# Para las graficas
+labels_ <- circular(c(4, 8, 12, 16, 20, 00), units = "hours")
+
+for (i in unique(pruebas$sp)) {
+  
+  datos_i <- pruebas %>% 
+    filter(sp == i)
+  par(mar = c(2, 2, 2, 2))
+  #densityPlot(datos_i$hora_radianes, xcenter="m", rug=TRUE, main = i)
+  
+  x <- circular(datos_i$hora_radianes, units="radians")  
+  res25 <- density(x, bw=50, control.circular=list(units="radians"))
+  par(mar=c(0,0,1,0))
+  plot(res25, shrink =1.5,  cex=0.6, axes=FALSE, ticks=FALSE, main = i)
+  rose.diag(x, bins = 18, add = TRUE, ticks = FALSE, axes = FALSE, col="#00FF99", lty=1, border = "grey")
+  arrows.circular(mean(x), lwd = 2, length = 0.15, col = "#458B00")
+  points(x, stack=TRUE, cex = 0.5, sep = 0.1)
+  axis.circular(at = labels_)
+}
+```
+
+
+
+```{r}
+datos_camaras <- read.csv("datos/info_dispositivos.csv") %>%
+  filter(tipo_dispositivo == "camera") %>% 
+  select(sitio, camara = id_dispositivo, long, lat, fecha_puesta, fecha_retiro) %>% 
+  filter(sitio == "CP") %>%
+  mutate(esfuerzo_aprox = ymd(fecha_retiro)-ymd(fecha_puesta)) %>% 
+  select(camara, esfuerzo_aprox) %>% 
+  mutate(sistema = substr(camara, 1, 4)) %>% 
+  group_by(sistema) %>% 
+  summarise(esfuerzo_aprox = sum(as.numeric(esfuerzo_aprox)))
+```
+
+```{r}
+tasa_registro_pruebas <- pruebas %>% 
+  mutate(sistema = substr(camara, 1, 4)) %>% 
+  group_by(sistema, sp) %>% 
+  summarize(registros_positivos = n()) %>%
+  left_join(datos_camaras, by = join_by(sistema)) %>% 
+  mutate(tasa_registro = round(registros_positivos/esfuerzo_aprox, 3)) %>% 
+  select(sistema, sp, tasa_registro)
+```
+
+```{r}
+tasa_registro_btau <- tasa_registro_pruebas %>% 
+  filter(sp == "Btau") %>% 
+  select(-sp)
+
+# Se agrega la tasa de registro de la vaca para cada sistema.
+datos_con_TR_btau <- pruebas %>% 
+  mutate(sistema = substr(camara, 1, 4)) %>% 
+  left_join(tasa_registro_btau, by = join_by(sistema)) %>% 
+  rename(TR_btau = tasa_registro) %>% 
+  mutate(TR_btau_categorias = if_else(TR_btau >= 0.1, "alta", if_else(TR_btau < 0.1, "baja", NA)))
+
+```
+
+Con esto se pueden hacer anlisis teniendo en cuenta la tasa de registros de la vaca, ej:
+
+```{r}
+
+labels_ <- circular(c(4, 8, 12, 16, 20, 00), units = "hours")
+
+# arreglos
+datos_con_TR_btau <- datos_con_TR_btau %>% 
+  filter(sp != "Btau" & sp %in% sp_filtradas) %>% 
+  filter(sistema != "CP13")
+
+for (j in unique(datos_con_TR_btau$sp)) {
+  for (i in unique(datos_con_TR_btau$TR_btau_categorias)) {
+  
+  datos_i <- datos_con_TR_btau %>% 
+    filter(TR_btau_categorias == i & sp == j)
+  par(mar = c(2, 2, 2, 2))
+  #densityPlot(datos_i$hora_radianes, xcenter="m", rug=TRUE, main = paste0(j, " ", i, " tasa ganado"))
+  
+  x <- circular(datos_i$hora_radianes, units="radians")  
+  res25 <- density(x, bw=50, control.circular=list(units="radians"))
+  par(mar=c(0,0,1,0))
+  plot(res25, shrink =1.5,  cex=0.6, axes=FALSE, ticks=FALSE, main = paste0(j, " ", i, " tasa ganado"))
+  rose.diag(x, bins = 18, add = TRUE, ticks = FALSE, axes = FALSE, col="#00FF99", lty=1, border = "grey")
+  arrows.circular(mean(x), lwd = 2, length = 0.15, col = "#458B00")
+  points(x, stack=TRUE, cex = 0.5, sep = 0.1)
+  axis.circular(at = labels_)
+}
+}
+
+```
+

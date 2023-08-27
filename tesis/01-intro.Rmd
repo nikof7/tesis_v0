@@ -1,0 +1,186 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+# Convertir hora local a solar
+
+Se va a utilizar el archivo "planilla_general.RData" descargada desde el drive del laboratorio.
+
+Primero se carga, se modifican los nombres de algunas columnas y se seleccionan solo las que se van a utilizar.
+
+```{r echo=FALSE}
+library(rmarkdown)
+```
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+load("datos/planilla_general.RData")
+datos <- data %>% 
+  filter(type == "Mammal") %>% 
+  select(sitio = site, sistema=station, camara = camera, datetime, grupo=group, sp=species)
+
+paged_table(head(datos))
+```
+
+También se necesitan los datos de las cámaras:
+
+- Longitud y latitud
+
+Se procede a cargar esos datos:
+
+```{r}
+datos_camaras <- read.csv("datos/info_dispositivos.csv") %>%
+  filter(tipo_dispositivo == "camera") %>% 
+  select(sitio, camara = id_dispositivo, long, lat)
+```
+
+## Preparación
+
+Ahora, se va a elegir el AP Cabo Polonio para poner a punto el código. De esta forma, una vez esten todos los datos se pueda correr el código y generar los mismos cálculos. Siempre y cuando el formato de los datos sea el mismo.
+
+```{r}
+datos <- datos %>% 
+  filter(sitio =="CP")
+
+datos_camaras <- datos_camaras %>% 
+  filter(sitio == "CP") %>% 
+  select(camara, long, lat)
+```
+
+```{r}
+datos <- datos %>% 
+  left_join(datos_camaras, by = join_by(camara))
+```
+
+## Ecuación del tiempo
+
+El movimiento aparente del Sol no es uniforme y la duración del día solar no es constante a lo largo del año. La diferencia entre el movimiento aparente del Sol y el movimiento medio se denomina ecuación del tiempo. La expresión tomada de General Solar Position calculations (NOAA) nos da la ecuación del tiempo en minutos:
+
+$$
+\Delta t = 229.18 \cdot (0.0.000075 + 0.001868 \cdot \cos{x} - 0.032077 \cdot \sin{x} - 0.014615 \cdot \cos{2x} - 0.040849 \sin{2x})
+$$
+
+Donde $x$ se define en función del número de día $N$ y la hora $h$
+$$
+x=\frac{2 \pi}{365}\left (N-1+ \frac{h-12}{24} \right )
+$$
+
+## Hora local y hora solar
+
+La hora solar se fundamenta en que la Tierra da una vuelta completa en 24 horas y que a las 12:00 h el Sol apunta exactamente hacia el sur. La hora solar verdadera se calcula mediante las dos ecuaciones siguientes:
+
+$$
+\textit{time_offset} = eq_{time}-4\cdot \textit{longitude}+60\cdot \textit{timezone}
+$$
+Donde:
+
+- $eq_{Time}$ es $\Delta T$, la ecuación del tiempo.
+- $\textit{longitude}$ es la longitud del lugar en grados.
+- $\textit{timezone}$ es el tiempo en horas desde UTC. En nuestro caso sería GMT-3, por lo que el valor sería -3.
+
+Finalmente, la _hora solar verdadera_ tst, en minutos, se obtiene mediante la siguiente ecuación:
+
+$$
+tst = hr \cdot 60 + min + \frac{seg}{60}+\textit{time_offset}
+$$
+
+## Conviertiendo
+
+Datos de ejemplo:
+```{r}
+# Obtiene los datos para el presente.
+hoy = now()
+N = yday(hoy) # Días del año.
+h = hour(hoy)
+mm = minute(hoy)
+ss = second(hoy)
+longitude = -56.22515783536338
+timezone = -3
+```
+
+Ecuación del tiempo, utilizando el x para los datos.
+```{r}
+x=2*pi*(N-1-(h-12)/24)/365
+eqtime=229.18*(0.000075+0.001868*cos(x)-0.032077*sin(x)-0.014615*cos(2*x)-0.040849*sin(2*x))
+```
+
+Diferencia de uso horario (time offset)
+```{r}
+time_offset=eqtime-4*longitude+60*timezone
+```
+
+Hora solar verdadera (tst)
+
+```{r}
+tst=h*60+mm+ss/60-time_offset
+```
+print(desplazamiento_horario)
+Este resultado es en minutos, si lo convertimos:
+
+```{r}
+hours_ <- tst/60
+minutes_<- (hours_-floor(hours_))*60
+seconds_ = (minutes_ -floor(minutes_))*60
+
+paste0(floor(hours_),":",floor(minutes_),":",floor(seconds_))
+```
+
+## Función de R para calcular hora solar verdadera
+
+```{r}
+horasolar <- function(datetime, longitude, timezone) {
+  date_structure <- as.POSIXlt(as.POSIXct(datetime), tz = timezone)
+  timezone_value <- date_structure$gmtoff / 3600
+  
+  N = yday(datetime) # Días del año.
+  h = hour(datetime)
+  mm = minute(datetime)
+  ss = second(datetime)
+
+  
+  x=2*pi*(N-1-(h-12)/24)/365
+  eqtime=229.18*(0.000075+0.001868*cos(x)-0.032077*sin(x)-0.014615*cos(2*x)-0.040849*sin(2*x))
+  
+  time_offset=eqtime-4*longitude+60*timezone_value
+  tst=h*60+mm+ss/60-time_offset
+  hours_ <- tst/60
+  minutes_<- (hours_-floor(hours_))*60
+  seconds_ = (minutes_ -floor(minutes_))*60
+  # Para formatear
+  hours_text <- abs(floor(hours_))
+  minutes_text <- abs(floor(minutes_))
+  seconds_text <- abs(floor(seconds_))
+  
+  
+  
+  hours_text <- ifelse(nchar(hours_text) < 2, paste0("0", hours_text), hours_text)
+  minutes_text <- ifelse(nchar(minutes_text) < 2, paste0("0", minutes_text), minutes_text)
+  seconds_text <- ifelse(nchar(seconds_text) < 2, paste0("0", seconds_text), seconds_text)
+  resultado <- paste0(as.character(date(datetime)), " ",hours_text, ":", minutes_text, ":", seconds_text) %>% 
+    as.POSIXct(., tz = timezone)
+  
+    
+  return(resultado)
+}
+```
+
+## Probando con datos reales
+
+Entonces, ahora apliquemos esta función al conjunto de datos. Para recordar como era la estructura de datos:
+
+```{r}
+datos %>% 
+  head() %>% 
+  paged_table()
+```
+Apliquemos la función:
+
+```{r}
+datos %>%
+    mutate(hora_solar = horasolar(datetime=datetime, longitude=long, timezone="America/Montevideo")) %>%
+  select(sitio, camara, datetime, hora_solar, sp) %>% 
+  head() %>% 
+  paged_table()
+```
+
