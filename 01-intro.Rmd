@@ -1,0 +1,73 @@
+# Carga de datos
+
+## Observaciones en cámaras trampa
+
+Se utilizan los datos obtenidos en el marco del proyecto ...
+
+```{r}
+load("H:/My Drive/Facultad/Tésis/Datos/planilla_general.RData")
+```
+
+### Preparación de datos
+
+Se lleva a cabo un proceso de filtrado para retener únicamente los datos relevantes.
+- Solo mamíferos
+- Todas las áreas protegidas (AP), exceptuando Quebrada de los Cuervos.
+
+```{r}
+datos <- datos %>% 
+  filter(type == "Mammal" & site != "QC") %>%
+  select(sitio = site, sistema = station, camara = camera, datetime, sp = species)
+```
+
+```{r echo=FALSE}
+paged_table(head(datos))
+```
+Otro dato importante con el cual contar en esta base de datos es la latitud y longitud de cada registro.
+
+```{r}
+coords_sitios <- read.csv("H:/My Drive/Facultad/Tésis/Datos/sitios_de_estudio.csv") %>% 
+  select(sitio = Name, lat = Y, lon = X)
+
+datos <- datos %>% 
+  left_join(coords_sitios, by = join_by(sitio)) %>% 
+  select(sitio, lat, lon, camara, datetime, sp)
+```
+
+
+Existe una totalidad de `r nrow(datos)` registros independientes. Por especie se tienen:
+
+```{r echo=FALSE}
+temp_var <- datos %>% 
+  select(sp) %>% 
+  group_by(sp) %>% 
+  summarise("Total" = n()) %>% 
+  arrange(-Total) %>% 
+  select("Especie" = sp, Total)
+ 
+ggplot() + geom_col(data = temp_var, aes(x = reorder(Especie, Total), y = Total), position = "dodge", fill = "#2B7C85") + 
+  coord_flip() +
+  labs(y = "Total de registros",
+       x = "Especies") +
+  geom_hline(yintercept = 100, color = "#0C1446") + theme_gray()
+
+rm(temp_var)
+``` 
+
+Por área de estudio
+
+```{r echo=FALSE}
+temp_var <- datos %>% 
+  group_by(sitio) %>% 
+  summarise(Total = n())
+
+ggplot() + geom_col(data = temp_var, aes(x = sitio, y = Total), position = "dodge", fill = "#2B7C85") + 
+  labs(y = "Total de registros",
+       x = "Especies") +
+  scale_y_continuous(breaks = round(seq(0, max(temp_var$Total), by = 250))) +
+  coord_flip()
+
+rm(temp_var)
+```
+
+

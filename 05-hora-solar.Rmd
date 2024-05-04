@@ -1,0 +1,63 @@
+# Convertir a hora solar
+
+Vamos a calcular la hora solar de todos los registros utilizando la metodología de @Nouvellet2011.
+
+```{r}
+# Funciones para realizar conversiones de horas a decimal y radian.
+source("functions/convert_hours.R")
+```
+
+
+```{r}
+prueba <- datos %>%
+  select(lat, lon, datetime) %>% 
+  mutate(decimal_hour = hourToDecimal(datetime),
+         day = day(datetime),
+         mot = month(datetime),
+         tz = as.POSIXlt(datetime)$gmtoff/3600,
+         RS = 1)
+```
+
+```{r}
+library(overlap)
+```
+
+```{r}
+overlap_datos <- datos %>% 
+  mutate(ClockTime = HourToRadians(datetime),
+         Dates = as.POSIXct(datetime, tz="America/Montevideo"),
+         a = "a") %>% 
+  select(ClockTime, Dates, lat, lon, a)
+```
+
+```{r}
+overlap_resultado <- list()
+for (i in nrow(overlap_datos)) {
+  Coords <- sp::SpatialPoints(matrix(c(overlap_datos$lat[i], overlap_datos$lon[i]), nrow=1), proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
+  
+  rows_update(overlap_datos, )
+  
+  overlap_datos <- overlap_resultado %>% 
+    mutate(overlap_resultado = sunTime(ClockTime, Dates, Coords))
+}
+```
+
+```{r}
+[2, "a"] <- "b"
+```
+
+
+
+```{r}
+prueba <- prueba[1,]
+ClockTime <- HourToRadians(prueba$datetime)
+
+Dates <- as.POSIXct(prueba$datetime, tz="America/Montevideo")
+
+Coords <- sp::SpatialPoints(matrix(c(prueba$lat, prueba$lon), nrow=1), proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
+
+
+plot(circular(c(sunTime(ClockTime, Dates, Coords), HourToRadians(prueba$datetime))), units = "radians")
+
+```
+

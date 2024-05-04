@@ -1,0 +1,48 @@
+# Fase lunar
+
+Se necesita tener la fase lunar de cada registro, quizás lo óptimo sería analizar solo los registros nocturnos, pero en esta oportunidad agregaré este dato a todos los registros. Para obtener este dato se utilizará el paquete suncalc.
+
+
+
+```{r}
+#library(suncalc)
+```
+
+Cuando se aplica la función `getMoonIllumination` se obtienen los siguientes datos.
+
+```{r}
+getMoonIllumination(date = Sys.Date()) 
+```
+
+Donde:
+
+- 0: Luna Nueva
+- Luna Creciente
+- 0.25: Cuarto Creciente
+- Luna Gibosa Creciente
+- 0.5: Luna Llena
+- Luna Gibosa Menguante
+- 0.75: Cuarto Menguante
+- Luna Menguante
+
+<p align="center">
+<img src="images/fasesluna.png" alt="isolated" width="500"/>
+</p>
+
+
+## Fase lunar de cada registro
+
+```{r}
+datos %>% 
+  mutate(fase_lunar = round(getMoonIllumination(as_date(datetime))$phase, 2)) %>% 
+  head() %>% 
+  paged_table()
+```
+
+
+## Registros nocturnos
+
+Para analizar los patrones de actividad utilizando las fases lunares, creo que es necesario saber qué registros son nocturnos. Para esto, al igual que CITAR Alexandra Tick Tack, delimitaron los registros nocturnos aquellos entre el final del atardecer y comienzo del amanecer.
+
+
+

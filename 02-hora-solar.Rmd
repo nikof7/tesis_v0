@@ -1,0 +1,207 @@
+# Hora solar
+
+## Clasificación utilizando horario solar
+
+```{r eval=FALSE}
+library(suncalc)
+```
+
+
+```{r}
+getSunlightTimes(date = Sys.Date(), lat = -34.66290264190734, lon = -56.22288916828886, tz = "America/Montevideo")
+```
+
+Supongamos separar los registros en:
+
+- **Nocturno**: Entre _Sunrise end_ y _Sunset start_
+- **Crepuscular**: Entre _Sunset start_ y _Sunset end_, así como _Sunrise start_ y _Sunrise end_
+- **Diurno**: Entre _Sunset end_ y _Sunrise start_
+
+
+Para identificar si un registro es nocturno, diurno o crepuscular según el horario solar, necesitamos conocer la hora del atardecer y del amanecer. El paquete suncalc nos proporciona estas horas específicas para cada día.
+
+Por ejemplo, para determinar si un registro es nocturno, se comprueba si está dentro del período que va desde el final del atardecer hasta el inicio del amanecer del día siguiente. Sin embargo, al programar esta solución se obtiene el horario del amanecer de ese mismo día, cuando en realidad se necesita el del día siguiente. Para solucionarlo, se identifica la fecha del primer y último registro, se completan los días intermedios y se aplica la función getSunlightTimes. Después, se ajusta cada valor de amanecer del día siguiente para que corresponda al amanecer del día actual. Esto resulta en una tabla que muestra la fecha, la hora del atardecer y la hora del amanecer del siguiente día, lo que facilita la clasificación de los registros.
+
+
+```{r}
+fechas_no_completas_por_sitio <- datos %>% 
+  select(datetime, sitio) %>% 
+  group_by(sitio) %>% 
+  mutate(date = as_date(datetime),
+         first_date = min(date),
+         last_date = max(date)) %>%
+  select(sitio, first_date, last_date) %>% 
+  distinct()
+```
+
+```{r echo=FALSE}
+paged_table(fechas_no_completas_por_sitio)
+```
+
+Se crea una función que rellena todos los días entre esas fechas.
+
+```{r}
+expandir_fechas <- function(sitio, first_date, last_date) {
+  seq(first_date, last_date, by = "day") %>%
+    tibble(
+      sitio = rep(sitio, length(.)),
+      date = .
+    )
+}
+```
+
+Lo siguiente es aplicar la función creada a la tabla.
+
+```{r}
+fechas_completas_por_sitio <- fechas_no_completas_por_sitio %>%
+  rowwise() %>%
+  do(expandir_fechas(.$sitio, .$first_date, .$last_date)) %>%
+  ungroup()
+```
+
+```{r echo=FALSE}
+paged_table(head(fechas_completas_por_sitio))
+```
+
+Lo siguiente es unir esta tabla con la tabla de coordenadas de cada sitio.
+
+```{r}
+datos_suncalc <- fechas_completas_por_sitio %>% 
+  left_join(coords_sitios, by = join_by(sitio)) %>%
+  select(-sitio) %>% 
+  getSunlightTimes(data=.,tz= "America/Montevideo")
+```
+
+```{r echo=FALSE}
+paged_table(head(datos_suncalc))
+```
+
+Antes de unir esta tabla con la de los registros independientes quiero explorar un poco estos datos.
+
+Por ejemplo, utilizando la clasificación de Alexandra quiero saber *cuánto demora el dia, la noche y el crepusculo en promedio*:
+
+```{r}
+pruebas <- datos_suncalc %>% 
+  select(sunriseStart = sunrise, sunriseEnd, sunsetStart, sunsetEnd = sunset) %>% 
+  mutate(day_length = sunsetStart - sunriseEnd,
+         night_length = lead(sunriseStart) - sunsetEnd,
+         crepuscular1 = sunsetEnd - sunsetStart,
+         crepuscular2 = sunriseEnd - sunriseStart,
+         total = day_length+night_length+crepuscular1+crepuscular2)
+```
+
+```{r echo=FALSE}
+paged_table(pruebas)
+```
+
+Como vemos los nichos de actividad se separan en una cantidad de tiempo dispar.
+
+```{r}
+datos_suncalc <- datos2 %>% 
+  left_join(coords_sitios, by = join_by(sitio)) %>% 
+  left_join(datos_suncalc, join_by(date, lat, lon)) %>% 
+  rename(sunriseStart = sunrise, sunsetEnd = sunset)
+```
+
+
+Lo siguiente es unir ambas tablas y luego categorizar los datos.
+
+- Nocturno: Entre _Sunrise end_ y _Sunset start_
+- Crepuscular: Entre _Sunset start_ y _Sunset end_, así como _Sunrise start_ y _Sunrise end_
+- Diurno: Entre _Sunset end_ y _Sunrise start_
+
+```{r}
+datos_suncalc %>% 
+  mutate(diel = case_when(
+    datetime > sunsetEnd | datetime < sunriseStart ~ "nocturno",
+    datetime > sunriseEnd | datetime < sunsetStart ~ "diurno",
+    datetime >= sunsetStart & datetime <= sunsetEnd | datetime >= sunriseStart & datetime <= sunriseEnd ~ "crepuscular"
+  )) %>% 
+  select(sitio, datetime, sunsetStart, sunsetEnd, sunriseStart, sunriseEnd, diel) %>% 
+  arrange(sitio, datetime) %>% 
+  head() %>% 
+  paged_table()
+
+#mutate(length_bt_sunset_sunrise = sunsetEnd-sunriseStart,
+#         length_bt_sunrise_sunset = sun)
+```
+
+Otra alternativa es utilizar el amanecer y atardecer náutico (referencias).
+
+<p align="center">
+<img src="images/twiligh-phases.png" alt="isolated" width="500"/>
+</p>
+
+En este sentido las duraciones de cada categoría serían las siguientes.
+
+```{r}
+datos_suncalc %>% 
+  select(nauticalDawn, dawn, sunriseStart, sunriseEnd, sunsetStart, sunsetEnd, nauticalDusk, dusk) %>% 
+  paged_table()
+```
+
+Otra opción es utilizar la **altitud del sol sobre el horizonte**; marcar la altura para que termine el amanecer y el comienzo del atardecer. Ya que para el inicio del amanecer y finalización del atardecer se pueden utilizar los datos náuticos.
+
+## Resumiendo ¿cuál es el problema?
+
+- Si utilizo la misma metodología que Alexandra Cravino las categorías de día, noche y catameral tienen diferente duración.
+
+¿Qué se me ocurre?
+
+Utilizar la posición del Sol con referencia al horizonte y determinar categorías. Por ejemplo el crepúsculo matutino podría ser desde el crepúsculo náutico (12° por debajo del horizonte) hasta los 12°por encima del horizonte.
+
+## Pruebas con posición del sol
+
+Primero se cargan los datos de las cámaras y se modifican para obtener las solo las columnas de fecha, latitud y longitud.
+
+```{r}
+pre_data_sun_positions <- datos %>% 
+  select(date = datetime, lat, lon)
+  
+sun_positions <- data_sun_positions %>% 
+  suncalc::getSunlightPosition(data = .) %>%
+  left_join(coords_sitios, by = join_by(lat, lon)) %>% 
+  select(sitio, date, altitude) %>% 
+  distinct()
+
+sun_position_data <- datos %>%
+  select(sitio, date = datetime, sp) %>% 
+  left_join(sun_positions, join_by(sitio, date))
+```
+
+Y de esta forma se obtiene
+
+```{r echo=FALSE}
+paged_table(head(sun_position_data))
+```
+
+De esta forma se obtiene la altitud; 0 es en el horizonte y pi/2 en el zenith. Lo bueno de esta técnica es que se puede jugar mucho más con los datos, ya que podemos elegir cuando comienza cada categoría de forma más fácil.
+
+
+```{r}
+ggplot(sun_position_data %>% filter(sp == "Cchi"), aes(x = altitude, y = 1, color = "Valores en radianes")) +
+  geom_point() + coord_polar()
+```
+## Prueba de paquete activity
+
+```{r eval=FALSE}
+install.packages("activity")
+```
+
+
+```{r}
+library(activity)
+```
+
+
+```{r}
+pre_activity_data <- datos %>% 
+  select(sitio, date = datetime, sp)
+
+paged_table(head(pre_activity_data))
+```
+
+```{r}
+#solartime(dat = as.POSIXct(pre_activity_data$date[1]), lat = pre_activity_data$lat[1], lon = pre_activity_data$lon[1], tz="America/Montevideo")
+```
+

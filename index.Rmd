@@ -1,0 +1,38 @@
+--- 
+title: "Tesis"
+author: "Nicolás Fernández-Sauleda"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+description: |
+  Donde se irá desarrollando mi tésis.
+link-citations: yes
+---
+
+# Acerca de
+
+Este documento es donde se irá desarrollando mi tésis.
+
+```{r, setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE,
+                      message = FALSE)
+library(tidyverse)
+library(rmarkdown)
+library(knitr)
+library(ggplot2)
+library(suncalc)
+```
+
+```{r}
+load(file = "H:/My Drive/Facultad/Tésis/Datos/planilla_general.RData")
+datos <- datos %>% 
+  rename(sitio=site)
+```
+
+```{r include=FALSE}
+# automatically create a bib database for R packages
+knitr::write_bib(c(
+  .packages(), 'bookdown', 'knitr', 'rmarkdown'
+), 'packages.bib')
+```

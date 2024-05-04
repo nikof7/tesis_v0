@@ -1,0 +1,92 @@
+# sunTime: Noisy clocks and silent sunrises
+
+Quiero explorar la diferencia entre la función `sunTime()` del paquete `overlap` con la función que utilizan en el trabajo de @Nouvellet2011.
+
+## Overlap
+
+```{r}
+library(overlap)
+library(sp)
+library(lubridate)
+library(tidyverse)
+```
+
+```{r}
+dates <- as.POSIXct(Sys.time(), tz="GMT")
+coords <- matrix(c(-32.522779, -55.765835), nrow=1)
+coords <- sp::SpatialPoints(coords, proj4string=sp::CRS("+proj=longlat +datum=WGS84"))
+datetime <- Sys.time()
+tiempo_radianes <- hour(datetime) * 3600 + minute(datetime) * 60 + second(datetime)
+tiempo_radianes <- tiempo_radianes / (24 * 3600) * 2 * pi
+
+```
+
+```{r}
+sunTime(Dates = dates, Coords = coords, clockTime = tiempo_radianes)
+```
+
+Esta función devuelve la hora solar en radianes.
+
+## SunTimede Nouvell _et al_
+
+```{r}
+source("functions/SunTime.R")
+```
+
+```{r}
+datetime <- Sys.time()
+
+hora <- hour(datetime)
+minuto <- minute(datetime)
+segundo <- second(datetime)
+
+# Calcula la hora decimal
+hora_decimal <- c(hora + minuto / 60 + segundo / 3600)
+
+dia <- c(day(datetime))
+mes <- c(month(datetime))
+lat <- c(-32.522779)
+lon <- c(-55.2369693)
+tz <- c(-3)
+
+#ClockTime,day,month,lat,long,timeZone,RS
+suntime_result <- SunTime(ClockTime = hora_decimal, day = dia, month = mes, lat = lat, long = lon, timeZone = tz, RS = 1)
+print(suntime_result)
+```
+
+```{r}
+hora_decimal_a_hms(suntime_result[1])
+```
+
+### Hora decimal a hms
+
+```{r}
+hora_decimal_a_hms <- function(hora_decimal) {
+  horas <- floor(hora_decimal)
+  minutos_decimal <- (hora_decimal - horas) * 60
+  minutos <- floor(minutos_decimal)
+  segundos <- round((minutos_decimal - minutos) * 60)
+  
+  tiempo_hms <- hms(paste(horas, minutos, segundos, sep = ":"))
+  return(tiempo_hms)
+}
+
+# Ejemplo de uso:
+hora_decimal <- 5.75
+tiempo_hms <- hora_decimal_a_hms(hora_decimal)
+print(tiempo_hms)
+
+```
+
+
+# Hora solar nico
+
+```{r}
+source("functions/hora_solar_nico.R")
+```
+
+```{r}
+datetime <- Sys.time()
+horasolar(datetime, longitude = -55.236969, timezone = "America/Montevideo")
+```
+

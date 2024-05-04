@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Parte 6 Convertir a hora solar | Tesis</title>
+  <meta name="description" content="Donde se irá desarrollando mi tésis." />
+  <meta name="generator" content="bookdown 0.38 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Parte 6 Convertir a hora solar | Tesis" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Donde se irá desarrollando mi tésis." />
+  
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Parte 6 Convertir a hora solar | Tesis" />
+  
+  <meta name="twitter:description" content="Donde se irá desarrollando mi tésis." />
+  
+
+<meta name="author" content="Nicolás Fernández-Sauleda" />
+
+
+<meta name="date" content="2024-05-04" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="suntime-noisy-clocks-and-silent-sunrises.html"/>
+<link rel="next" href="references.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">Tesis</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="1" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i><b>1</b> Acerca de</a></li>
+<li class="chapter" data-level="2" data-path="carga-de-datos.html"><a href="carga-de-datos.html"><i class="fa fa-check"></i><b>2</b> Carga de datos</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="carga-de-datos.html"><a href="carga-de-datos.html#observaciones-en-cámaras-trampa"><i class="fa fa-check"></i><b>2.1</b> Observaciones en cámaras trampa</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="carga-de-datos.html"><a href="carga-de-datos.html#preparación-de-datos"><i class="fa fa-check"></i><b>2.1.1</b> Preparación de datos</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="hora-solar.html"><a href="hora-solar.html"><i class="fa fa-check"></i><b>3</b> Hora solar</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="hora-solar.html"><a href="hora-solar.html#clasificación-utilizando-horario-solar"><i class="fa fa-check"></i><b>3.1</b> Clasificación utilizando horario solar</a></li>
+<li class="chapter" data-level="3.2" data-path="hora-solar.html"><a href="hora-solar.html#resumiendo-cuál-es-el-problema"><i class="fa fa-check"></i><b>3.2</b> Resumiendo ¿cuál es el problema?</a></li>
+<li class="chapter" data-level="3.3" data-path="hora-solar.html"><a href="hora-solar.html#pruebas-con-posición-del-sol"><i class="fa fa-check"></i><b>3.3</b> Pruebas con posición del sol</a></li>
+<li class="chapter" data-level="3.4" data-path="hora-solar.html"><a href="hora-solar.html#prueba-de-paquete-activity"><i class="fa fa-check"></i><b>3.4</b> Prueba de paquete activity</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="fase-lunar.html"><a href="fase-lunar.html"><i class="fa fa-check"></i><b>4</b> Fase lunar</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="fase-lunar.html"><a href="fase-lunar.html#fase-lunar-de-cada-registro"><i class="fa fa-check"></i><b>4.1</b> Fase lunar de cada registro</a></li>
+<li class="chapter" data-level="4.2" data-path="fase-lunar.html"><a href="fase-lunar.html#registros-nocturnos"><i class="fa fa-check"></i><b>4.2</b> Registros nocturnos</a></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="suntime-noisy-clocks-and-silent-sunrises.html"><a href="suntime-noisy-clocks-and-silent-sunrises.html"><i class="fa fa-check"></i><b>5</b> sunTime: Noisy clocks and silent sunrises</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="suntime-noisy-clocks-and-silent-sunrises.html"><a href="suntime-noisy-clocks-and-silent-sunrises.html#overlap"><i class="fa fa-check"></i><b>5.1</b> Overlap</a></li>
+<li class="chapter" data-level="5.2" data-path="suntime-noisy-clocks-and-silent-sunrises.html"><a href="suntime-noisy-clocks-and-silent-sunrises.html#suntimede-nouvell-et-al"><i class="fa fa-check"></i><b>5.2</b> SunTimede Nouvell <em>et al</em></a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="suntime-noisy-clocks-and-silent-sunrises.html"><a href="suntime-noisy-clocks-and-silent-sunrises.html#hora-decimal-a-hms"><i class="fa fa-check"></i><b>5.2.1</b> Hora decimal a hms</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="convertir-a-hora-solar.html"><a href="convertir-a-hora-solar.html"><i class="fa fa-check"></i><b>6</b> Convertir a hora solar</a></li>
+<li class="chapter" data-level="" data-path="references.html"><a href="references.html"><i class="fa fa-check"></i>References</a></li>
+<li class="divider"></li>
+<li><a href="https://github.com/rstudio/bookdown" target="blank">Nicolás Fernández-Sauleda</a></li>
+
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Tesis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="convertir-a-hora-solar" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">Parte 6</span> Convertir a hora solar<a href="convertir-a-hora-solar.html#convertir-a-hora-solar" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Vamos a calcular la hora solar de todos los registros utilizando la metodología de <span class="citation">Nouvellet et al. (<a href="#ref-Nouvellet2011">2011</a>)</span>.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="convertir-a-hora-solar.html#cb1-1" tabindex="-1"></a>datos</span></code></pre></div>
+<pre><code>##     sitio       lat       lon camara            datetime   sp
+## 1      SM -33.72585 -53.58035 SM06_3 2023-02-07 07:56:22 Btau
+## 2      SM -33.72585 -53.58035 SM06_2 2023-02-06 15:05:08 Btau
+## 3      SM -33.72585 -53.58035 SM01_1 2023-02-06 12:51:12 Oari
+## 4      SM -33.72585 -53.58035 SM01_1 2023-02-06 12:13:33 Btau
+## 5      SM -33.72585 -53.58035 SM01_1 2023-02-06 08:07:45 Btau
+## 6      SM -33.72585 -53.58035 SM01_1 2023-02-05 21:59:46 Btau
+## 7      SM -33.72585 -53.58035 SM01_1 2023-02-05 18:00:13 Btau
+## 8      SM -33.72585 -53.58035 SM05_1 2023-02-05 14:34:00 Sscr
+## 9      SM -33.72585 -53.58035 SM01_2 2023-02-05 14:29:37 Leur
+## 10     SM -33.72585 -53.58035 SM05_1 2023-02-05 13:40:00 Btau
+## 11     SM -33.72585 -53.58035 SM05_3 2023-02-04 21:32:00 Dnov
+## 12     SM -33.72585 -53.58035 SM04_2 2023-02-04 19:51:00 Mgou
+## 13     SM -33.72585 -53.58035 SM01_1 2023-02-04 10:59:38 Oari
+## 14     SM -33.72585 -53.58035 SM01_2 2023-02-03 09:17:06 Oari
+## 15     SM -33.72585 -53.58035 SM05_1 2023-02-02 22:27:00 Sscr
+## 16     SM -33.72585 -53.58035 SM04_1 2023-02-02 04:21:00 Sscr
+## 17     SM -33.72585 -53.58035 SM04_2 2023-02-02 00:13:00 Mgou
+## 18     SM -33.72585 -53.58035 SM01_2 2023-02-01 21:33:10 Oari
+## 19     SM -33.72585 -53.58035 SM05_3 2023-02-01 20:49:00 Sscr
+## 20     SM -33.72585 -53.58035 SM05_1 2023-02-01 20:02:00 Mgou
+## 21     SM -33.72585 -53.58035 SM06_2 2023-02-01 12:10:44 Btau
+## 22     SM -33.72585 -53.58035 SM06_2 2023-02-01 09:57:08 Btau
+## 23     SM -33.72585 -53.58035 SM01_1 2023-01-31 20:54:47 Lgym
+## 24     SM -33.72585 -53.58035 SM01_1 2023-01-31 17:41:43 Btau
+## 25     SM -33.72585 -53.58035 SM04_1 2023-01-31 15:17:00 Mgou
+## 26     SM -33.72585 -53.58035 SM01_3 2023-01-31 15:02:18 Ecab
+## 27     SM -33.72585 -53.58035 SM06_2 2023-01-31 11:35:17 Btau
+## 28     SM -33.72585 -53.58035 SM06_2 2023-01-30 13:23:33 Btau
+## 29     SM -33.72585 -53.58035 SM06_2 2023-01-30 10:47:41 Btau
+## 30     SM -33.72585 -53.58035 SM01_2 2023-01-30 08:57:33 Oari
+## 31     SM -33.72585 -53.58035 SM06_3 2023-01-29 23:16:02 Btau
+## 32     SM -33.72585 -53.58035 SM06_2 2023-01-29 09:50:10 Btau
+## 33     SM -33.72585 -53.58035 SM01_3 2023-01-29 06:34:53 Oari
+## 34     SM -33.72585 -53.58035 SM01_2 2023-01-29 00:49:32 Dnov
+## 35     SM -33.72585 -53.58035 SM01_2 2023-01-28 23:35:38 Btau
+## 36     SM -33.72585 -53.58035 SM05_3 2023-01-28 20:07:00 Sscr
+## 37     SM -33.72585 -53.58035 SM06_2 2023-01-28 17:48:57 Btau
+## 38     SM -33.72585 -53.58035 SM06_2 2023-01-28 16:36:44 Btau
+## 39     SM -33.72585 -53.58035 SM01_2 2023-01-28 06:53:32 Btau
+## 40     SM -33.72585 -53.58035 SM01_3 2023-01-27 22:06:01 Btau
+## 41     SM -33.72585 -53.58035 SM01_3 2023-01-27 18:21:57 Ecab
+## 42     SM -33.72585 -53.58035 SM01_3 2023-01-27 18:14:52 Btau
+## 43     SM -33.72585 -53.58035 SM06_2 2023-01-27 11:23:35 Btau
+## 44     SM -33.72585 -53.58035 SM06_2 2023-01-27 07:14:02 Btau
+## 45     SM -33.72585 -53.58035 SM01_3 2023-01-27 00:46:19 Lgym
+## 46     SM -33.72585 -53.58035 SM01_1 2023-01-26 14:47:56 Btau
+## 47     SM -33.72585 -53.58035 SM04_2 2023-01-26 11:09:00 Mgou
+## 48     SM -33.72585 -53.58035 SM01_3 2023-01-26 10:45:09 Oari
+## 49     SM -33.72585 -53.58035 SM06_2 2023-01-26 07:10:45 Btau
+## 50     SM -33.72585 -53.58035 SM01_1 2023-01-25 21:22:53 Ctho
+## 51     SM -33.72585 -53.58035 SM01_2 2023-01-25 16:42:08 Ecab
+## 52     SM -33.72585 -53.58035 SM05_1 2023-01-25 15:19:00 Mgou
+## 53     SM -33.72585 -53.58035 SM01_1 2023-01-25 14:45:10 Btau
+## 54     SM -33.72585 -53.58035 SM06_2 2023-01-25 12:17:54 Btau
+## 55     SM -33.72585 -53.58035 SM05_1 2023-01-25 10:36:00 Mgou
+## 56     SM -33.72585 -53.58035 SM01_1 2023-01-25 08:14:47 Ctho
+## 57     SM -33.72585 -53.58035 SM01_1 2023-01-25 07:58:51 Btau
+## 58     SM -33.72585 -53.58035 SM06_2 2023-01-24 15:27:38 Btau
+## 59     SM -33.72585 -53.58035 SM01_3 2023-01-24 11:21:15 Ecab
+## 60     SM -33.72585 -53.58035 SM04_1 2023-01-24 10:53:00 Sscr
+## 61     SM -33.72585 -53.58035 SM01_3 2023-01-24 07:45:43 Btau
+## 62     SM -33.72585 -53.58035 SM01_2 2023-01-23 00:27:23 Btau
+## 63     SM -33.72585 -53.58035 SM04_2 2023-01-22 20:48:00 Mgou
+## 64     SM -33.72585 -53.58035 SM04_2 2023-01-22 17:40:00 Mgou
+## 65     SM -33.72585 -53.58035 SM05_1 2023-01-22 10:00:00 Sscr
+## 66     SM -33.72585 -53.58035 SM01_3 2023-01-21 20:31:03 Btau
+## 67     SM -33.72585 -53.58035 SM04_2 2023-01-21 17:43:00 Mgou
+## 68     SM -33.72585 -53.58035 SM04_2 2023-01-21 06:02:00 Ctho
+## 69     SM -33.72585 -53.58035 SM01_2 2023-01-21 01:31:22 Dnov
+## 70     SM -33.72585 -53.58035 SM06_2 2023-01-20 15:22:04 Ctho
+## 71     SM -33.72585 -53.58035 SM01_1 2023-01-20 14:28:05 Btau
+## 72     SM -33.72585 -53.58035 SM05_1 2023-01-20 10:21:00 Btau
+## 73     SM -33.72585 -53.58035 SM01_1 2023-01-20 09:41:11 Btau
+## 74     SM -33.72585 -53.58035 SM04_2 2023-01-20 05:47:00 Sscr
+## 75     SM -33.72585 -53.58035 SM01_3 2023-01-20 02:47:06 Lgym
+## 76     SM -33.72585 -53.58035 SM01_2 2023-01-20 00:16:06 Ecab
+## 77     SM -33.72585 -53.58035 SM05_3 2023-01-19 19:37:00 Sscr
+## 78     SM -33.72585 -53.58035 SM04_2 2023-01-19 19:28:00 Mgou
+## 79     SM -33.72585 -53.58035 SM04_1 2023-01-19 10:06:00 Sscr
+## 80     SM -33.72585 -53.58035 SM01_3 2023-01-19 07:13:05 Oari
+## 81     SM -33.72585 -53.58035 SM04_2 2023-01-18 20:32:00 Sscr
+## 82     SM -33.72585 -53.58035 SM04_2 2023-01-18 20:24:00 Mgou
+## 83     SM -33.72585 -53.58035 SM05_3 2023-01-18 19:49:00 Sscr
+## 84     SM -33.72585 -53.58035 SM04_1 2023-01-18 19:47:00 Mgou
+## 85     SM -33.72585 -53.58035 SM04_2 2023-01-18 19:40:00 Ctho
+## 86     SM -33.72585 -53.58035 SM01_1 2023-01-18 16:48:21 Leur
+## 87     SM -33.72585 -53.58035 SM05_3 2023-01-18 12:25:00 Sscr
+## 88     SM -33.72585 -53.58035 SM01_1 2023-01-18 11:19:14 Btau
+## 89     SM -33.72585 -53.58035 SM05_3 2023-01-18 09:29:00 Sscr
+## 90     SM -33.72585 -53.58035 SM01_3 2023-01-17 06:38:08 Oari
+## 91     SM -33.72585 -53.58035 SM01_1 2023-01-16 14:02:13 Btau
+## 92     SM -33.72585 -53.58035 SM01_2 2023-01-16 08:33:12 Oari
+## 93     SM -33.72585 -53.58035 SM06_3 2023-01-16 07:11:12 Btau
+## 94     SM -33.72585 -53.58035 SM05_1 2023-01-16 04:00:00 Sscr
+## 95     SM -33.72585 -53.58035 SM06_3 2023-01-15 18:10:07 Btau
+## 96     SM -33.72585 -53.58035 SM04_1 2023-01-15 14:45:00 Sscr
+## 97     SM -33.72585 -53.58035 SM06_2 2023-01-15 13:17:12 Btau
+## 98     SM -33.72585 -53.58035 SM04_1 2023-01-15 10:10:00 Sscr
+## 99     SM -33.72585 -53.58035 SM01_3 2023-01-15 05:56:02 Leur
+## 100    SM -33.72585 -53.58035 SM04_2 2023-01-14 21:29:00 Mgou
+## 101    SM -33.72585 -53.58035 SM06_3 2023-01-14 18:40:27 Btau
+## 102    SM -33.72585 -53.58035 SM06_3 2023-01-14 17:07:13 Btau
+## 103    SM -33.72585 -53.58035 SM04_2 2023-01-14 14:01:00 Mgou
+## 104    SM -33.72585 -53.58035 SM04_1 2023-01-14 13:53:00 Sscr
+## 105    SM -33.72585 -53.58035 SM06_2 2023-01-14 12:19:07 Btau
+## 106    SM -33.72585 -53.58035 SM06_2 2023-01-14 10:39:21 Mgou
+## 107    SM -33.72585 -53.58035 SM04_2 2023-01-14 04:13:00 Sscr
+## 108    SM -33.72585 -53.58035 SM04_2 2023-01-13 19:14:00 Ctho
+## 109    SM -33.72585 -53.58035 SM04_2 2023-01-13 19:06:00 Mgou
+## 110    SM -33.72585 -53.58035 SM01_2 2023-01-13 16:49:12 Leur
+## 111    SM -33.72585 -53.58035 SM06_2 2023-01-13 16:07:03 Sscr
+## 112    SM -33.72585 -53.58035 SM06_3 2023-01-13 15:19:11 Btau
+## 113    SM -33.72585 -53.58035 SM01_3 2023-01-13 15:03:21 Oari
+## 114    SM -33.72585 -53.58035 SM01_2 2023-01-13 14:21:31 Leur
+## 115    SM -33.72585 -53.58035 SM06_2 2023-01-13 14:11:09 Btau
+## 116    SM -33.72585 -53.58035 SM01_2 2023-01-13 09:55:24 Leur
+## 117    SM -33.72585 -53.58035 SM01_3 2023-01-13 08:31:41 Leur
+## 118    SM -33.72585 -53.58035 SM01_2 2023-01-12 23:41:53 Dnov
+## 119    SM -33.72585 -53.58035 SM01_2 2023-01-12 11:39:11 Oari
+## 120    SM -33.72585 -53.58035 SM01_1 2023-01-12 11:00:39 Oari
+## 121    SM -33.72585 -53.58035 SM01_1 2023-01-12 08:54:22 Btau
+## 122    SM -33.72585 -53.58035 SM04_1 2023-01-11 20:45:00 Mgou
+## 123    SM -33.72585 -53.58035 SM01_1 2023-01-11 19:44:38 Btau
+## 124    SM -33.72585 -53.58035 SM01_1 2023-01-11 17:32:35 Btau
+## 125    SM -33.72585 -53.58035 SM01_1 2023-01-11 14:05:53 Btau
+## 126    SM -33.72585 -53.58035 SM01_1 2023-01-11 10:09:10 Btau
+## 127    SM -33.72585 -53.58035 SM01_2 2023-01-11 09:42:11 Oari
+## 128    SM -33.72585 -53.58035 SM01_3 2023-01-10 21:10:58 Lgym
+## 129    SM -33.72585 -53.58035 SM05_1 2023-01-10 14:17:00 Btau
+## 130    SM -33.72585 -53.58035 SM05_1 2023-01-10 07:43:00 Btau
+## 131    SM -33.72585 -53.58035 SM01_2 2023-01-10 07:22:04 Btau
+## 132    SM -33.72585 -53.58035 SM05_1 2023-01-10 02:06:00 Sscr
+## 133    SM -33.72585 -53.58035 SM06_3 2023-01-10 01:49:56 Btau
+## 134    SM -33.72585 -53.58035 SM01_2 2023-01-09 23:42:47 Dnov
+## 135    SM -33.72585 -53.58035 SM01_3 2023-01-09 21:15:58 Lgym
+## 136    SM -33.72585 -53.58035 SM04_2 2023-01-09 07:51:00 Mgou
+## 137    SM -33.72585 -53.58035 SM04_2 2023-01-09 05:31:00 Sscr
+## 138    SM -33.72585 -53.58035 SM05_3 2023-01-09 05:17:00 Sscr
+## 139    SM -33.72585 -53.58035 SM01_2 2023-01-08 21:30:18 Dnov
+## 140    SM -33.72585 -53.58035 SM04_2 2023-01-08 20:39:00 Sscr
+## 141    SM -33.72585 -53.58035 SM01_3 2023-01-08 19:14:03 Ecab
+## 142    SM -33.72585 -53.58035 SM04_2 2023-01-08 14:20:00 Mgou
+## 143    SM -33.72585 -53.58035 SM06_2 2023-01-08 13:34:46 Btau
+## 144    SM -33.72585 -53.58035 SM04_2 2023-01-08 12:28:00 Sscr
+## 145    SM -33.72585 -53.58035 SM06_2 2023-01-08 11:40:56 Btau
+## 146    SM -33.72585 -53.58035 SM01_1 2023-01-08 09:24:34 Oari
+## 147    SM -33.72585 -53.58035 SM01_3 2023-01-08 06:06:41 Oari
+## 148    SM -33.72585 -53.58035 SM01_3 2023-01-08 02:49:11 Lgym
+## 149    SM -33.72585 -53.58035 SM01_3 2023-01-08 01:14:14 Ctho
+## 150    SM -33.72585 -53.58035 SM06_3 2023-01-07 20:31:45 Btau
+## 151    SM -33.72585 -53.58035 SM01_3 2023-01-07 14:49:23 Ecab
+## 152    SM -33.72585 -53.58035 SM04_2 2023-01-07 14:01:00 Mgou
+## 153    SM -33.72585 -53.58035 SM06_2 2023-01-07 12:29:55 Btau
+## 154    SM -33.72585 -53.58035 SM04_2 2023-01-07 12:15:00 Mgou
+## 155    SM -33.72585 -53.58035 SM01_2 2023-01-07 12:12:43 Oari
+## 156    SM -33.72585 -53.58035 SM01_2 2023-01-07 09:23:50 Oari
+## 157    SM -33.72585 -53.58035 SM05_3 2023-01-07 08:13:00 Mgou
+## 158    SM -33.72585 -53.58035 SM04_2 2023-01-06 18:38:00 Mgou
+## 159    SM -33.72585 -53.58035 SM06_2 2023-01-06 14:53:01 Btau
+## 160    SM -33.72585 -53.58035 SM01_3 2023-01-06 12:45:42 Ecab
+## 161    SM -33.72585 -53.58035 SM05_1 2023-01-06 11:27:00 Mgou
+## 162    SM -33.72585 -53.58035 SM01_3 2023-01-06 11:17:40 Btau
+## 163    SM -33.72585 -53.58035 SM01_2 2023-01-06 10:36:51 Oari
+## 164    SM -33.72585 -53.58035 SM04_1 2023-01-06 09:00:00 Sscr
+## 165    SM -33.72585 -53.58035 SM06_1 2023-01-06 07:37:56 Ctho
+## 166    SM -33.72585 -53.58035 SM06_2 2023-01-06 07:21:11 Btau
+##  [ reached &#39;max&#39; / getOption(&quot;max.print&quot;) -- omitted 7381 rows ]</code></pre>
+
+</div>
+<h3>References<a href="references.html#references" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Nouvellet2011" class="csl-entry">
+Nouvellet, P., G. S. A. Rasmussen, D. W. Macdonald, and F. Courchamp. 2011. <span>“Noisy Clocks and Silent Sunrises: Measurement Methods of Daily Activity Pattern.”</span> Edited by Anne Braae. <em>Journal of Zoology</em> 286 (3): 179–84. <a href="https://doi.org/10.1111/j.1469-7998.2011.00864.x">https://doi.org/10.1111/j.1469-7998.2011.00864.x</a>.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="suntime-noisy-clocks-and-silent-sunrises.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="references.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": "https://github.com/USERNAME/REPO/edit/BRANCH/05-hora-solar.Rmd",
+"text": "Edit"
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["_main.pdf"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "subsection"
+}
+});
+});
+</script>
+
+</body>
+
+</html>
